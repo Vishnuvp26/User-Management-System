@@ -8,13 +8,13 @@ const securePassword = async (password) => {
     } catch (err) {
         console.log(err.message);
     }
-}
+};
 
 const loadRegister = async (req, res) => {
     try {
-        res.render('registration.ejs')
+        res.render('registration.ejs');
     } catch (err) {
-        console.log(err.messege)
+        console.log(err.messege);
     }
 };
 
@@ -27,22 +27,59 @@ const insertUser = async (req, res) => {
             mobile: req.body.mobile,
             image: req.file.filename,
             password: sPassword,
-            is_admin:0
+            is_admin: 0
         });
         
         const userData = await user.save();
         if (userData) {
-            res.render('registration',{message: 'Your registration has been successfull'})
+            res.render('registration', { message: 'Your registration has been successfull' });
         } else {
-            res.render('registration',{message: 'Your registration has been failed'})
+            res.render('registration', { message: 'Your registration has been failed' });
         }
  
     } catch (err) {
         console.log(err.message);
     }
-}
+};
+
+
+//login user method
+const loginLoad = async (req, res) => {
+    try {
+        res.render('login');
+    } catch (err) {
+        console.log(err.message);
+    }
+};
+
+const verifyLogin = async (req, res) => {
+    try {
+        const email = req.body.emai;
+        const password = req.body.password;
+
+        const userData = await User.findOne({ email: email });
+        if (userData) {
+            const passwordMatch = await bcrypt.compare(password, userData.password);
+            if (passwordMatch) {
+                // if (userData.is_varified === 0) {
+                //     res.render('login', {message: "Please verify your mail"})
+                // } else {
+                //     res.redirect('/home')
+                // }
+            } else {
+                res.render('login', { message: "Email and Password is incorrect" });
+            }
+        } else {
+            res.render('login', { message: "Email and Password is incorrect" });
+        }
+    } catch (err) {
+        console.log(err.message);
+    }
+};
 
 module.exports = {
     loadRegister,
-    insertUser
-} 
+    insertUser,
+    loginLoad
+};
+
