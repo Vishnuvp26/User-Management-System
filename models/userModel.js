@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const userSchema = mongoose.Schema({
+const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
@@ -25,10 +25,10 @@ const userSchema = mongoose.Schema({
         type: Number,
         required: true
     },
-    is_verified: {
+    is_varified: {
         type: Number,
         default: 0
     }    
 });
 
-module.exports = mongoose.model('User', userSchema)
+module.exports = mongoose.model('User', userSchema); 
