@@ -1,5 +1,5 @@
 const User = require("../models/userModel");
-    const bcrypt = require("bcrypt");
+const bcrypt = require("bcrypt");
 
 const loadLogin = async (req, res) => {
     try {
@@ -46,10 +46,10 @@ const loadDashboard = async (req, res) => {
 
 const logout = async (req, res) => {
     try {
-      req.session.destroy();
-      res.redirect("/admin");
+        req.session.destroy();
+        res.redirect("/admin");
     } catch (error) {
-      res.send(error.message);
+        res.send(error.message);
     }
 };
 
