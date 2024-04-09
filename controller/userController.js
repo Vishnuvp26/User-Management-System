@@ -52,32 +52,56 @@ const loginLoad = async (req, res) => {
     }
 };
 
+// const verifyLogin = async (req, res) => {
+//     try {
+//         const email = req.body.email;
+//         const password = req.body.password;
+
+//         const userData = await User.findOne({ email: email });
+//         if (userData) {
+//             const passwordMatch = await bcrypt.compare(password, userData.password);
+//             if (passwordMatch) {
+//                 if (userData.is_varified === 0) {
+//                     res.render('login', {message: "Please verify your mail"})
+//                 } else {
+//                     req.session.user_id = userData._id;
+//                     res.redirect('/home')
+//                 }
+//             } else {
+//                 res.render('login', { message: "Email and Password is incorrect" });
+//             }
+//         } else {
+//             res.render('login', { message: "Email and Password is incorrect" });
+//         }
+//     } catch (err) {
+//         console.log(err.message);
+//     }
+// };
+
 const verifyLogin = async (req, res) => {
     try {
-        const email = req.body.email;
-        const password = req.body.password;
-
-        const userData = await User.findOne({ email: email });
-        if (userData) {
-            const passwordMatch = await bcrypt.compare(password, userData.password);
-            if (passwordMatch) {
-                if (userData.is_varified === 0) {
-                    res.render('login', {message: "Please verify your mail"})
-                } else {
-                    req.session.user_id = userData._id;
-                    res.redirect('/home')
-                }
-            } else {
-                res.render('login', { message: "Email and Password is incorrect" });
-            }
+      const email = req.body.email;
+      const password = req.body.password;
+  
+      const userData = await User.findOne({ email: email });
+  
+      if (userData) {
+        const passwordMatch = await bcrypt.compare(password, userData.password);
+  
+        if (passwordMatch) {
+          req.session.user_id = userData._id;
+          res.redirect("/home");
         } else {
-            res.render('login', { message: "Email and Password is incorrect" });
+          res.render("login", { message: "Wrong Password" });
         }
-    } catch (err) {
-        console.log(err.message);
+      } else {
+        res.render("login", { message: "No user found" });
+      }
+    } catch (error) {
+      res.send(error.message);
     }
-};
-
+  };
+ 
 const loadHome = async (req, res) => {
     try {
         const userData = await User.findById({ _id: req.session.user_id });
@@ -86,16 +110,59 @@ const loadHome = async (req, res) => {
     } catch (err) {
         console.log(err.message);
     }
-}
+};
 
 const userLogout = async (req, res) => {
     try {
-        req.session.destroy(); 
+        req.session.destroy();
         res.redirect('/');
     } catch (err) {
         console.log(err.message);
     }
-}
+};
+
+
+//user profile edit & update
+const editProfile = async (req, res) => {
+    try {
+        const id = req.query.id;
+        const userData = await User.findById(id);
+        if (userData) {
+            res.render('edit', { user: userData });
+        } else {
+            res.redirect('/home');
+        }
+    } catch (err) {
+        console.log(err.message);
+    }
+};
+
+const updateProfile = async (req, res) => {
+    try {
+        if (req.file) {
+            await User.findByIdAndUpdate(req.body.user_id, {
+                $set: {
+                    name: req.body.name,
+                    email: req.body.email,
+                    mobile: req.body.mobile,
+                    image: req.file.filename
+                }
+            });
+        } else {
+            await User.findByIdAndUpdate(req.body.user_id, {
+                $set: {
+                    name: req.body.name,
+                    email: req.body.email,
+                    mobile: req.body.mobile
+                }
+            });
+        }
+        res.redirect('/home');
+    } catch (err) {
+        console.log(err.message);
+    }
+};
+
 
 module.exports = {
     loadRegister,
@@ -103,6 +170,8 @@ module.exports = {
     loginLoad,
     verifyLogin,
     loadHome,
-    userLogout
+    userLogout,
+    editProfile,
+    updateProfile
 };
 

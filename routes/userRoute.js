@@ -3,9 +3,6 @@ const user_route = express();
 const session = require('express-session');
 
 const config = require('../config/config');
-
-// user_route.use(session({ secret: config.sessionSecret }));
-
 user_route.use(session({
     secret: config.sessionSecret,
     resave: false,
@@ -31,7 +28,7 @@ const storage = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         const name = Date.now() + '-' + file.originalname;
-        cb(null, name);                      5
+        cb(null, name);
     }
 });
 const upload = multer({ storage: storage });
@@ -44,11 +41,14 @@ user_route.post('/register', upload.single('image'), userController.insertUser);
 
 user_route.get('/', auth.isLogout, userController.loginLoad);
 user_route.get('/login', auth.isLogout, userController.loginLoad);
-
 user_route.post('/login', userController.verifyLogin);
 
 user_route.get('/home', auth.isLogin, userController.loadHome);
 
-user_route.get('/logout', auth.isLogin,userController.userLogout);
+user_route.get('/logout', auth.isLogin, userController.userLogout);
+
+user_route.get('/edit', auth.isLogin, userController.editProfile);
+
+user_route.post('/edit',upload.single('image'),userController.updateProfile)
 
 module.exports = user_route; 
